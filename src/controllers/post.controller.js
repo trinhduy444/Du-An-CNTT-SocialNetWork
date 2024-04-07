@@ -67,4 +67,10 @@ const getAllPost= async (req, res) =>{
         metadata: await postService.getAllPost(req, res),
     }).send(res);
 }
-module.exports = { getAllPostTypes,createPost,editPost,openDetail,deletePost,displayFile,getPost,displayFileFromAPost,getAllPostByType,getAllPostByUser,getAllPost}
+const updatePost = async (req, res) =>{
+    new OK({
+        message: 'Update Post Successfully',
+        metadata: await postService.updatePost(req, res),
+    }).send(res);
+}
+module.exports = { getAllPostTypes,createPost,editPost,openDetail,deletePost,displayFile,updatePost,getPost,displayFileFromAPost,getAllPostByType,getAllPostByUser,getAllPost}

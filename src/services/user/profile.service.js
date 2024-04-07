@@ -145,7 +145,7 @@ class profileService{
           const limit = parseInt(req.query.limit) || 5;
           const skip = parseInt(req.query.skip) || 0;
   
-          const posts = await PostModel.find({ user_id: userId }).sort({ createdAt: -1 }).limit(limit).skip(skip);
+          const posts = await PostModel.find({ user_id: userId, status: 'approved' }).sort({ createdAt: -1 }).limit(limit).skip(skip);
   
           const postsWithReactData = await Promise.all(posts.map(async (post) => {
               const { _id, user_id, title, advertisement_id, type_post_id, content, address, website, image, video, createdAt, updatedAt } = post;

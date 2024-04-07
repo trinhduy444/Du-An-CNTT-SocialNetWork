@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const {authentication,checkAuthIsAdmin} = require('../middleware/auth.middleware');
-const {getAllPostTypes,createPost,editPost,getPost,openDetail,deletePost,displayFile,displayFileFromAPost,getAllPostByType,getAllPostByUser,getAllPost} = require('../controllers/post.controller');
+const {getAllPostTypes,createPost,editPost,getPost,openDetail,deletePost,updatePost,displayFile,displayFileFromAPost,getAllPostByType,getAllPostByUser,getAllPost} = require('../controllers/post.controller');
 const {upload} = require('../middleware/multer.middleware');
 const reactRouter = require('./react.route');
 router.route('/getAllPostType').get(getAllPostTypes);
@@ -15,6 +15,9 @@ router.route('/editPost/:postId').post(authentication,upload.fields([
     { name: 'image', maxCount: 4 },
     { name: 'video', maxCount: 1 },
   ]),editPost);
+router.route('/updatePost/:postId').post(authentication,upload.fields([
+  { name: 'image', maxCount: 4 },
+]),updatePost);
 router.route('/getPost/:postId').get(getPost);
 router.route('/displayFileFromAPost/:postId').get(displayFileFromAPost);
 router.route('/displayFile/:fileId').get(displayFile);

@@ -4,6 +4,7 @@ const {PostTypeModel, PostModel,CommentModel,ReactModel} = require('../../models
 const { ObjectId } = require('mongodb');
 const mongoose = require('mongoose');
 const { getGridBucket } = require('../../middleware/multer.middleware');
+const { forEach } = require('lodash');
 
 class postService{
     /*
@@ -125,7 +126,52 @@ class postService{
             res.status(500).json({ message: 'Internal Server Error' });
         }
     }
-    
+    static async updatePost(req,res){
+        try{
+            const user_id = req.user.userId;
+            const post_id = new mongoose.Types.ObjectId(req.params.postId);
+            const {title,content,address,website,imageDeleted} = req.body;  
+            const post = await PostModel.findById(post_id);
+            if(!post) throw new NotFoundError("No post found");
+            if(post.user_id != user_id) throw new BadRequestError("You are not allowed to update this post");
+        
+            const images = req.files['image'] ? req.files['image'].map(image => image.id) : [];
+            console.log(images);
+            const gridBucket = getGridBucket();
+            if (imageDeleted && imageDeleted.length > 0) {
+                for (const imageId of imageDeleted) {
+                    const imgid = new mongoose.Types.ObjectId(imageId);
+                    // console.log("imgid",imgid); 
+                    const imageFile = await gridBucket.find({ _id: imgid }).toArray();
+                    if (imageFile.length > 0) {
+                        await gridBucket.delete(imageFile[0]._id);
+                        post.image = post.image.filter(imgId => imgId.toString() !== imageId);
+                    }
+                }
+            }            
+            // console.log("image trc do:", post.image);
+            const newArrayImages = await images.map(image => image.toString());
+            const arrayImages = await post.image.map(imgId => imgId.toString());
+            
+            post.image = [arrayImages, newArrayImages].reduce((a, b) => a.concat(b), []);
+            // console.log("image sau khi save:", post.image);
+
+            if( title != null && title.length > 0){
+                post.title = title;
+            }
+            if( content != null && content.length > 0){
+                post.content = content;
+            }
+            post.address = address;
+            post.website = website;
+
+            await post.save();
+            return getInfoData(post, ["_id", "title", "type_post_id", "content", "user_id", "website", "address", "image", "video"]);
+        }catch(error){
+            console.error(error);
+            return res.status(500).json({ message: 'Internal Server Error' });
+        }
+    }
     static async getPost(req, res){
         try{
             const post_id = new mongoose.Types.ObjectId(req.params.postId);

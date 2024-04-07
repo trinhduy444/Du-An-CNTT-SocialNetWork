@@ -22,7 +22,7 @@ const storage = new GridFsStorage({
     const userid = req.user.userId;
     if (req.url.includes('updateAvatar') == true) {
       filename = 'avatar-' + userid + '-' + Date.now() + path.extname(file.originalname);
-    } else if (req.url.includes('createPost')) {
+    } else if (req.url.includes('post')) {
       filename = 'post-' + userid + '-' + Date.now() + path.extname(file.originalname);
     } else {
       filename = 'defaut-' + userid + '-' + Date.now() + path.extname(file.originalname);

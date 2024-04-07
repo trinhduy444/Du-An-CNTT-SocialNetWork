@@ -92,6 +92,11 @@ class interactionService {
 
     static async getAllReportTypes(req,res){
         try{
+            const report_from = req.body.report_from;
+            if(report_from) {
+                const reportTypes = await ReportTypeModel.find({report_from}).select('name report_from');
+                return reportTypes;
+            }
             const reportTypes = await ReportTypeModel.find().select('name report_from');
             return reportTypes;
         }catch(error){
@@ -120,7 +125,9 @@ class interactionService {
     static async createReport(req,res){
         try{
             const {report_type_id,post_id,content} = req.body;
-            const reported_user_id = req.params.reported_user_id;
+            const reported_user_id = new mongoose.Types.ObjectId(req.params.reported_user_id);
+            if(!reported_user_id) throw new BadRequestError('reported_user_id is required');
+            console.log(reported_user_id);
             const creator_id = req.user.userId;
 
             const newReport = new ReportModel({report_type_id,reported_user_id,creator_id,post_id,content});

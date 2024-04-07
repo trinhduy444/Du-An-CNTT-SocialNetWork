@@ -11,6 +11,39 @@ const KeyTokenService  = require('./keyToken.service');
 const sendMail = require('../../utils/email.util');
 const BASE_URL = process.env.BASE_URL;
 class authService {
+    static async createAdmin(req, res) {
+        try{
+            const permission = req.user.permission;
+            if (permission !== 'admin') throw new BadRequestError("You can't access here, don't have permission");
+            
+            const{username, phone_number, email ,password} = req.body;
+
+            let userExist = false;
+            if(req.body.email !== ''){
+                await UserModel.findOne ({email: req.body.email}).then(UserModel=>{
+                    if(UserModel){
+                        userExist = true;
+                    }
+                })
+                .catch(error => console.log(error));
+            }
+            if (userExist) {
+                throw new InvalidInputError('Email đã tồn tại, không thể đăng ký');
+            }
+
+            const hashedPassword = await bcrypt.hash(password, 10);
+    
+            const newUser = new UserModel({username, phone_number, email, password: hashedPassword, permission: 'admin'});
+            await newUser.save();
+        } catch(error){
+            console.error(error);
+            if (error instanceof InvalidInputError) {
+                res.status(error.statusCode).json({ message: error.message });
+            } else {
+                res.status(500).json({ message: 'Lỗi server' });
+            }
+        }
+    }
     /*
     1. signup User with data: username, password, email (unique), password
     2. Check user exists
