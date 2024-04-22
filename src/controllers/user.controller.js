@@ -34,5 +34,18 @@ const viewProfileByID = async (req, res) =>{
       metadata: await profileService.viewProfileByID(req, res),
   }).send(res);
 }
-module.exports = {getProfile , updateProfile, updateAvatar,getAvatar,getAvatarByName,viewProfileByID}
+const viewFollowers = async (req, res) =>{
+  new OK({
+      message: 'Get Profile Successfully',
+      metadata: await profileService.viewFollowers(req, res),
+  }).send(res);
+
+}
+const viewFolloweds = async (req, res) =>{
+  new OK({
+      message: 'Get Profile Successfully',
+      metadata: await profileService.viewFolloweds(req, res),
+  }).send(res);
+}
+module.exports = {getProfile , updateProfile, updateAvatar,getAvatar,getAvatarByName,viewProfileByID,viewFolloweds,viewFollowers}
 

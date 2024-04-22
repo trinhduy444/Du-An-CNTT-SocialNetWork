@@ -190,10 +190,28 @@ class profileService{
           res.status(500).json({ message: 'Internal Server Error' });
       }
     }
-  
-  
-  
-
+  static async viewFollowers(req,res){
+    try{
+      const followed_id = req.params.userId;
+      const followers = await FollowModel.find({followed_id}).populate('follower_id','username');
+      const numberOfFollowers = followers.length;
+      return {numberOfFollowers,followers};
+    }catch(error){
+      console.log(error);
+      res.status(500).json({ message: 'Internal Server Error' });
+    }
+  }
+  static async viewFolloweds(req,res){
+    try{
+      const follower_id = req.params.userId;
+      const followeds = await FollowModel.find({follower_id}).populate('followed_id','username');
+      const numberOfFolloweds = followeds.length;
+      return {numberOfFolloweds,followeds};
+    }catch(error){
+      console.log(error);
+      res.status(500).json({ message: 'Internal Server Error' });
+    }
+  }
 }
 
 module.exports = profileService;
